@@ -107,7 +107,7 @@ router.delete("/:id", (req, res) => {
   }
 });
 
-router.post("/upload/:id", upload.single("book"), (req, res) => {
+router.post("/:id/upload", upload.single("book"), (req, res) => {
   const { library } = stor;
   const { id } = req.params;
   const idx = library.findIndex((el) => el.id === id);
@@ -121,6 +121,20 @@ router.post("/upload/:id", upload.single("book"), (req, res) => {
     res.status(404);
     res.json("404 | страница не найдена");
     // TODO: Should also remove uploaded file
+  }
+});
+
+router.get("/:id/download", (req, res) => {
+  const { library } = stor;
+  const { id } = req.params;
+  const idx = library.findIndex((el) => el.id === id);
+
+  if (idx !== -1) {
+    const path = library[idx].fileBook;
+    res.download(path);
+  } else {
+    res.status(404);
+    res.json("404 | страница не найдена");
   }
 });
 
