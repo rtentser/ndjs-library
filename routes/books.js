@@ -32,7 +32,28 @@ const stor = {
 
 router.get("/", (req, res) => {
   const { library } = stor;
-  res.json(library);
+  res.render("index", {
+    title: "Library",
+    library: library,
+  });
+});
+
+router.get("/create", (req, res) => {
+  res.render("create", {
+    title: "Book | create",
+    book: {},
+  });
+});
+
+router.post("/create", (req, res) => {
+  const { library } = stor;
+  const { title, description, authors } = req.body;
+  console.log(req.body);
+
+  const newBook = new Book(title, description, authors);
+  library.push(newBook);
+
+  res.redirect("/api/books");
 });
 
 router.get("/:id", (req, res) => {
@@ -40,71 +61,59 @@ router.get("/:id", (req, res) => {
   const { id } = req.params;
   const idx = library.findIndex((el) => el.id === id);
 
-  if (idx !== -1) {
-    res.json(library[idx]);
-  } else {
-    res.status(404);
-    res.json("404 | страница не найдена");
+  if (idx === -1) {
+    res.redirect("/404");
   }
+
+  res.render("view", {
+    title: "Book | view",
+    book: library[idx],
+  });
 });
 
-router.post("/", (req, res) => {
-  const { library } = stor;
-  const { title, description, authors, favorite, fileCover, fileName } =
-    req.body;
-
-  const newBook = new Book(
-    title,
-    description,
-    authors,
-    favorite,
-    fileCover,
-    fileName
-  );
-  library.push(newBook);
-
-  res.status(201);
-  res.json(newBook);
-});
-
-router.put("/:id", (req, res) => {
-  const { library } = stor;
-  const { title, description, authors, favorite, fileCover, fileName } =
-    req.body;
-  const { id } = req.params;
-  const idx = library.findIndex((el) => el.id === id);
-
-  if (idx !== -1) {
-    const changedBook = new Book(
-      title,
-      description,
-      authors,
-      favorite,
-      fileCover,
-      fileName,
-      library[idx].id
-    );
-    library[idx] = changedBook;
-
-    res.json(library[idx]);
-  } else {
-    res.status(404);
-    res.json("404 | страница не найдена");
-  }
-});
-
-router.delete("/:id", (req, res) => {
+router.get("/:id/update", (req, res) => {
   const { library } = stor;
   const { id } = req.params;
   const idx = library.findIndex((el) => el.id === id);
 
-  if (idx !== -1) {
-    library.splice(idx, 1);
-    res.json(true);
-  } else {
-    res.status(404);
-    res.json("404 | страница не найдена");
+  if (idx === -1) {
+    res.redirect("/404");
   }
+
+  res.render("update", {
+    title: "Book | view",
+    book: library[idx],
+  });
+});
+
+router.post("/:id/update", (req, res) => {
+  const { library } = stor;
+  const { title, description, authors } = req.body;
+  const { id } = req.params;
+  const idx = library.findIndex((el) => el.id === id);
+
+  if (idx === -1) {
+    res.redirect("/404");
+  }
+
+  library[idx].title = title;
+  library[idx].description = description;
+  library[idx].authors = authors;
+
+  res.redirect(`/api/books/${id}`);
+});
+
+router.post("/:id/delete", (req, res) => {
+  const { library } = stor;
+  const { id } = req.params;
+  const idx = library.findIndex((el) => el.id === id);
+
+  if (idx === -1) {
+    res.redirect("/404");
+  }
+
+  library.splice(idx, 1);
+  res.redirect("/api/books");
 });
 
 router.post("/:id/upload", upload.single("book"), (req, res) => {
