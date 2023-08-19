@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+  counter:
+    build: ./library-counter
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./storage:/storage

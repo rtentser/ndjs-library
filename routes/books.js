@@ -1,6 +1,7 @@
 const { v4: uuid } = require("uuid");
 const express = require("express");
 const upload = require("../middleware/file");
+const axios = require("axios").default;
 
 const router = express.Router();
 
@@ -48,7 +49,6 @@ router.get("/create", (req, res) => {
 router.post("/create", (req, res) => {
   const { library } = stor;
   const { title, description, authors } = req.body;
-  console.log(req.body);
 
   const newBook = new Book(title, description, authors);
   library.push(newBook);
@@ -56,7 +56,7 @@ router.post("/create", (req, res) => {
   res.redirect("/api/books");
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   const { library } = stor;
   const { id } = req.params;
   const idx = library.findIndex((el) => el.id === id);
@@ -65,9 +65,14 @@ router.get("/:id", (req, res) => {
     res.redirect("/404");
   }
 
+  console.log(`http://counter:3001/counter/${id}/incr`);
+  await axios.post(`http://counter:3001/counter/${id}/incr`);
+  let views = await axios.get(`http://counter:3001/counter/${id}`);
+
   res.render("view", {
     title: "Book | view",
     book: library[idx],
+    views: views.data,
   });
 });
 
