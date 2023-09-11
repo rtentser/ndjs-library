@@ -27,7 +27,7 @@ db.books.find(
 3. запрос для редактирования полей: description и authors коллекции books по \_id записи.
 
 ```
-db.books.uodateOne(
+db.books.updateOne(
     { _id: "id" },
     { $set: {description: "Description", authors: "Author"} }
 )
