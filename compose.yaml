@@ -3,9 +3,21 @@ services:
     build: .
     ports:
       - "3000:3000"
+    environment:
+      URL_DB: mongodb://root:example@mongo:27017/
+
   counter:
     build: ./library-counter
     ports:
       - "3001:3001"
     volumes:
       - ./storage:/storage
+
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - ./storage/db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
