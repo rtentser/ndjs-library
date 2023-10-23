@@ -1,17 +1,24 @@
+// require("dotenv").config();
 const express = require("express");
+const session = require("express-session");
+const passport = require("passport");
 const mongoose = require("mongoose");
 
-const userRoute = require("./routes/user");
+const authRoute = require("./routes/auth");
 const booksRoute = require("./routes/books");
 const errorMiddleware = require("./middleware/error");
 
 const app = express();
-
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.set("view engine", "ejs");
 
-app.use("/api/user", userRoute);
+app.use(express.urlencoded({ extended: true }));
+app.use(session({ secret: "SECRET", resave: true, saveUninitialized: true }));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use("/api/user", authRoute);
 app.use("/api/books", booksRoute);
 
 app.use(errorMiddleware);
