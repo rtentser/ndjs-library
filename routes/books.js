@@ -35,12 +35,13 @@ router.post("/create", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
+
   let book;
 
   try {
     book = await Books.findById(id).select("-__v");
-    await axios.post(`http://counter:3001/counter/${id}/incr`);
-    let views = await axios.get(`http://counter:3001/counter/${id}`);
+    await axios.post(`http://localhost:3001/counter/${id}/incr`);
+    let views = await axios.get(`http://localhost:3001/counter/${id}`);
 
     res.render("view", {
       title: "Book | view",
